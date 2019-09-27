@@ -86,12 +86,13 @@ def main():
     
     # main loop
     count = 0
+    population = initialPopulation
     while count < loop:
         count += 1
-        parents = []
         selected = []
+        parents = []
         #route: [3, 5, 61, 24, 6, ..., 2412]
-        for route in initialPopulation:
+        for route in population:
             fitness = computeFitness(route, cities)
             parent = Parent(route, fitness)
             parents.append()
@@ -100,8 +101,8 @@ def main():
         selected = sampleSUS(parents)
         crossovered = orderedCrossover(selected)
         mutated = mutate(crossovered)
-        goingNextGeneration = chooseBestGeneration(mutated)
-
+        population = chooseBestGeneration(mutated)
+        
 
     prob_open.close()    
 
