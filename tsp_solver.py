@@ -38,6 +38,14 @@ def initialPopulationMST(num, pop):
 def getFitness(route, cities):
     distance = 0
     actualRoute = [cities[i-1] for i in route]
+    length = len(actualRoute)
+    # starts with i=0
+    for i in range(length):
+        if i == (length-1):
+            distance += actualRoute[i].getDistance(actualRoute[0])
+        else:
+            distance += actualRoute[i].getDistance(actualRoute[i+1])
+            
         
 
 
