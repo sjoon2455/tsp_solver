@@ -2,6 +2,7 @@
 import sys
 import random
 from cityClass import City
+from parentClass import Parent
 ### given list of int with city indices, create csv file
 ### input: list of int
 ### output: .csv with single column city indices
@@ -30,14 +31,15 @@ def initialPopulationMST(num, pop):
     population = []
     alignedList = list(range(1, num+1))
 '''
-'''
+
 ### calculate fitness: total distance between cities
 ### input: list of int
 ### output: int
-def getFitness(li):
-    for i in li:
-        a = City(i, xxx, yyy)
-'''
+def getFitness(route, cities):
+    distance = 0
+    actualRoute = [cities[i-1] for i in route]
+        
+
 
 '''
 def select()
@@ -52,22 +54,37 @@ def mutate()
 def main():
     prob = sys.argv[1]
     prob_open = open(prob, 'r')
-    #pop = sys.argv[2]
+    pop = sys.argv[2]
+    loop = sys.argv[3]
+
     lines = prob_open.readlines()
     len = lines[3]
     num = int(len[12:])
     lines = lines[6:]
     lines = [i.split(" ") for i in lines]
+    #cities: list of City()
     cities = []
     for i in range(0, num):
         x = lines[i][1]
         y = lines[i][2]
         cities.append(City(i, x, y))
+    initialPopulation = initialPopulation(num, pop)
+    
+    count = 0
+    while count < loop:
+        count += 1
+        parents = []
+        #route: [3, 5, 61, 24, 6, ..., 2412]
+        for route in initialPopulation:
+            fitness = getFitness(route, cities)
+            parent = Parent(route, fitness)
+            parents.append()
+    
     
     #print(lines[:12])
 
 
-    #initialPopulation = initialPopulation(num, pop)
+    
 
     
 

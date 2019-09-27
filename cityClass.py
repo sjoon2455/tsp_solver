@@ -4,5 +4,5 @@ class City:
         self.x = x
         self.y = y
     
-    def distance(self, c):
+    def getDistance(self, c):
         return(((self.x-c.x)**2+(self.y-c.y)**2)**0.5)
