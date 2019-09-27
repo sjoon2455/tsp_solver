@@ -22,8 +22,8 @@ selection
         linear ranking
         exponential ranking
     어떻게 뽑을지
-        룰렛(팔 N개)
-        THIS - 토너먼트
+        THIS - 룰렛(팔 N개)
+        토너먼트(?)
         오버셀렉션
 
 

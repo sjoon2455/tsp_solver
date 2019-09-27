@@ -7,3 +7,7 @@ class Parent:
     
     def getFitness(self):
         return self.fit
+    
+    def setProbability(self, prob):
+        self.prob = prob
+        return 1
