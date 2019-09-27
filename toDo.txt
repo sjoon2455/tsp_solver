@@ -1,14 +1,30 @@
 X initial population 숫자 정해줄 수 있게
 argparse로 type check
 
+
+
+def select()
+def computeFitness()
+def crossover()
+def mutate()
+
+
 initial -> (fitness -> select -> crossover -> mutate -> selection) -> stop
 
 initial
-    random shuffle
+    THIS - random shuffle
     minimum spanning tree
 
 selection
-    selection operator 어떤 확률로 뽑을지
+    어떤 확률로 뽑을지
+        THIS - FPS
+        FPS improved
+        linear ranking
+        exponential ranking
+    어떻게 뽑을지
+        룰렛(팔 N개)
+        THIS - 토너먼트
+        오버셀렉션
 
 
 ordered crossover
@@ -31,5 +47,5 @@ DFS
 
 
 stopping criterion:
-    1. loop
+    THIS - 1. loop
     2. fitness value
