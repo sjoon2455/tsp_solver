@@ -29,7 +29,8 @@ selection
 
 ordered crossover
     rate
-
+    THIS - how
+        랜덤으로 짝 짓기, 랜덤으로 몇 개 골라서 order 유지한 채로 바꾸기
 
 mutation
     rate
@@ -41,7 +42,7 @@ generational selection
     gradual replacement
 
 
-
+hyperparameter: 초기 인구 수, selection 시 몇 개 뽑을지, crossover 시 rate, mutation 시 rate
 
 DFS
 

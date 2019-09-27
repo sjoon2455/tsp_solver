@@ -1,6 +1,7 @@
 # coding: utf-8
 import sys
 import random
+import datetime
 from cityClass import City
 from parentClass import Parent
 
@@ -42,7 +43,7 @@ def computeFitness(route, cities):
 ### output: .csv with single column city indices
 def createCSV(arg):
     len = len(arg)
-    csv = open('solution.csv', 'w')
+    csv = open('solution_{0}.csv'.format(str(datetime.datetime.now().time())[:-7]), 'w')
     for i in range(len):
         data = arg[i]
         csv.write(data)
@@ -58,6 +59,16 @@ def sumFitness(parents):
     for i in parents:
         fit = i.getFitness()
         res += fit
+    return res
+
+### list of parent -> list of city indices
+### input: list of parent
+### output: list of int
+def parentToInt(solution)
+    res = []
+    for parent in solution:
+        index = parent.getList().getIndex()
+        res.append(index)
     return res
 
 
@@ -76,6 +87,7 @@ def main():
     num = int(len[12:])
     lines = lines[6:]
     lines = [i.split(" ") for i in lines]
+    
     #cities: list of City()
     cities = []
     for i in range(0, num):
@@ -98,12 +110,39 @@ def main():
             parents.append()
         sumFitness = sumFitness(parents)
         parents = computeFPS(parents, sumFitness)
-        selected = sampleSUS(parents)
+        selected = sampleSUS(parents, pop)
         crossovered = orderedCrossover(selected)
         mutated = mutate(crossovered)
         population = chooseBestGeneration(mutated)
-        
+    theBestOne = chooseBestOne(population)
+    solution = parentToInt(theBestOne)
+    createCSV(solution)
 
     prob_open.close()    
+
+
+
+### compute each probabilty of being selected proportional to each fitness value
+### input: list of list of Parent(), total sum of fitness
+### output: list of list of Parent()
+def computeFPS(parents, sumFitness)
+
+### 룰렛 팔 N개로 N개를 뽑음
+### input: list of list of Parent(), number of next generation
+### ouput: list of list of Parent()
+def sampleSUS(parents, N)
+
+### Make pairs of Parent()s, randomly and uniformly pick some part and switch the same number sequence retaining its orders
+### input: list of list of Parent(), crossover rate(0~1.0)
+### output: list of list of Parent()
+def orderedCrossover(selected, r)
+
+### 
+def mutate(crossovered, r)
+
+### maintain M best from Parents, get rid of M worst from Current
+### input: list of list of Parent()
+### output: list of list of Parent()
+def chooseBestGeneration(mutated)
 
 main()
