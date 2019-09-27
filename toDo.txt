@@ -1,0 +1,35 @@
+X initial population 숫자 정해줄 수 있게
+argparse로 type check
+
+initial -> (fitness -> select -> crossover -> mutate -> selection) -> stop
+
+initial
+    random shuffle
+    minimum spanning tree
+
+selection
+    selection operator 어떤 확률로 뽑을지
+
+
+ordered crossover
+    rate
+
+
+mutation
+    rate
+
+
+generational selection
+    generational replacement
+    elitism
+    gradual replacement
+
+
+
+
+DFS
+
+
+stopping criterion:
+    1. loop
+    2. fitness value
