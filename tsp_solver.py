@@ -4,6 +4,7 @@ import random
 import datetime
 from cityClass import City
 from parentClass import Parent
+from geneIndexClass import Geneindex
 from printPretty import printPretty
 
 ################################################# MAJOR FUNCTION #################################################
@@ -83,33 +84,8 @@ def orderedCrossover(selected, r)
             child = breed(pair[0], pair[1], r)
             child.append(child)
     return childs
+        
 
-### breed a child b/w dad Parent() and mom Parent() with crossover rate r
-### input: Parent(), Parent(), float(0~1)
-### output: Parent()
-def breed(dad, mom, r):
-    crossover_cities = []
-    dadRoute = dad.getList()
-    momRoute = mom.getList()
-    index = 0
-    #type check necessary
-    for i in dadRoute:
-        if isPicked(i, r):
-            a = Geneindex(i, index)
-            crossover_cities.append(a)
-            momRoute.replace(i, 0)
-        index += 1
-    for j in crossover_cities:
-        momRoute[j.getIndex()] = j.getNum()
-    child = Parent(momRoute, 0)
-    return child
-
-### randomly create pairs of Parent()s
-### input: list of Parent()
-### output: list of pair of Parent()
-def makePair(parents)
-    length = len(parents)
-    
 
 '''
 ### Not sure yet...
@@ -171,6 +147,49 @@ def getCumulProb(parents):
             res[i] = res[i-1] + prob
         i += 1
     return res
+
+### breed a child b/w dad Parent() and mom Parent() with crossover rate r
+### input: Parent(), Parent(), float(0~1)
+### output: Parent()
+def breed(dad, mom, r):
+    crossover_cities = []
+    dadRoute = dad.getList()
+    momRoute = mom.getList()
+    index = 0
+    #type check necessary
+    for i in dadRoute:
+        if isPicked(i, r):
+            a = Geneindex(i, index)
+            crossover_cities.append(a)
+            momRoute.replace(i, 0)
+        index += 1
+    for j in crossover_cities:
+        momRoute[j.getIndex()] = j.getNum()
+    child = Parent(momRoute, 0)
+    return child
+
+### randomly create pairs of Parent()s
+### input: list of Parent()
+### output: list of pair of Parent()
+def makePair(parents)
+    pairs = []
+    length = len(parents)
+    if length % 2 == 0:
+        while(len(parents) != 0):
+            dad = random.choice(parents)
+            parents.remove(dad)
+            mom = random.choice(parents)
+            parents.remove(mom)
+            pairs.append(list(dad, mom))
+    else:
+        while(len(parents) != 1):
+            dad = random.choice(parents)
+            parents.remove(dad)
+            mom = random.choice(parents)
+            parents.remove(mom)
+            pairs.append(list(dad, mom))
+        pairs.append(list(parents[0]))
+    return pairs
 
 ################################################# MAIN FUNCTION #################################################
 ### main function
