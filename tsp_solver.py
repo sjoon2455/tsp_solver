@@ -6,6 +6,7 @@ from cityClass import City
 from parentClass import Parent
 from geneIndexClass import Geneindex
 from printPretty import printPretty
+import math
 
 ################################################# MAJOR FUNCTION #################################################
 ### get initial population using random shuffle. Number of initial population able to assign.
@@ -147,6 +148,23 @@ def getCumulProb(parents):
             res[i] = res[i-1] + prob
         i += 1
     return res
+
+### Check if picked with a probability of r
+### input: num(not used), probability(0~1.0)
+### output: boolean
+def isPicked(num, r):
+    sampleSpace = []
+    firstdecimal_r = math.round(r*10)/10
+    win = int(firstdecimal_r * 10)
+    lose = 10 - win
+    for i in range(win):
+        sampleSpace.append(1)
+    for j in range(lose):
+        sampleSpace.append(0)
+    lottery = random.choice(sampleSpace)
+    return True if lottery == 1 else False
+    
+
 
 ### breed a child b/w dad Parent() and mom Parent() with crossover rate r
 ### input: Parent(), Parent(), float(0~1)
