@@ -86,12 +86,19 @@ def orderedCrossover(selected, r)
             child.append(child)
     return childs
         
+### swap two num within a list
+def mutateIndividual(li, r):
+    
+    
 
-
-'''
-### Not sure yet...
-def mutate(crossovered, r)
-'''
+### with some probability r, swap two cities
+### input: list of Parent(), probability r(0~1.0)
+### output: list of Parent()
+def mutate(crossovered, r):
+    for parent in crossovered:
+        li = parent.getList()
+        mutated_li = mutateIndividual(li, r)
+        parent.setList(mutated_li)
 
 ### maintain M best from Parents, get rid of M worst from Current
 ### input: list of Parent()

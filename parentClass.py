@@ -19,3 +19,7 @@ class Parent:
     
     def getList(self):
         return self.li
+    
+    def setList(self, newli):
+        self.li = newli
+        return 1
