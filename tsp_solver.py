@@ -73,10 +73,49 @@ def sampleSUS(parents, N):
 ### input: list of Parent(), crossover rate(0~1.0)
 ### output: list of Parent()
 def orderedCrossover(selected, r)
+    childs = []
+    pairs = makePair(selected)
+    for pair in pairs:
+        if len(pair) % 2 == 1:
+            child = pair[0]
+            childs.append(child)
+        else:
+            child = breed(pair[0], pair[1], r)
+            child.append(child)
+    return childs
+
+### breed a child b/w dad Parent() and mom Parent() with crossover rate r
+### input: Parent(), Parent(), float(0~1)
+### output: Parent()
+def breed(dad, mom, r):
+    crossover_cities = []
+    dadRoute = dad.getList()
+    momRoute = mom.getList()
+    index = 0
+    #type check necessary
+    for i in dadRoute:
+        if isPicked(i, r):
+            a = Geneindex(i, index)
+            crossover_cities.append(a)
+            momRoute.replace(i, 0)
+        index += 1
+    for j in crossover_cities:
+        momRoute[j.getIndex()] = j.getNum()
+    child = Parent(momRoute, 0)
+    return child
+
+### randomly create pairs of Parent()s
+### input: list of Parent()
+### output: list of pair of Parent()
+def makePair(parents)
+    length = len(parents)
+    
+
 '''
 ### Not sure yet...
 def mutate(crossovered, r)
 '''
+
 ### maintain M best from Parents, get rid of M worst from Current
 ### input: list of Parent()
 ### output: list of Parent()

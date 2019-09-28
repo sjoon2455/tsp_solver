@@ -1,3 +1,5 @@
+# coding: utf-8
+# n, x, y: int
 class City:
     def __init__(self, n, x, y):
         self.n = n

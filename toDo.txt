@@ -30,7 +30,7 @@ selection
 ordered crossover
     rate
     THIS - how
-        랜덤으로 짝 짓기, 랜덤으로 몇 개 골라서 order 유지한 채로 바꾸기
+        랜덤으로 두 개씩 짝지어서 breed, 나머지는 elitism
 
 mutation
     rate
