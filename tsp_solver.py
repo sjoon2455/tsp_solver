@@ -120,7 +120,7 @@ def mutateIndividual(li, r):
             li[n2] = swap1
     return li
 
-    
+
 ################################################# MAJOR FUNCTION #################################################
 ### get initial population using random shuffle. Number of initial population able to assign.
 ### input: number of cities, num of initial population
@@ -210,12 +210,24 @@ def mutate(crossovered, r):
         mutated_li = mutateIndividual(li, r)
         parent.setList(mutated_li)
 
+
 ### maintain M best from Parents, get rid of M worst from Current
 ### input: list of Parent()
 ### output: list of Parent()
 def chooseBestGeneration(mutated)
 
 
+
+
+### choose the best fitness Parent() among Parent()s
+### input: list of Parent()
+### output: Parent()
+def chooseBestOne(pop):
+    res = pop[0]
+    for parent in pop:
+        if parent.getFitness() > res.getFitness():
+            res = parent
+    return res
 
 
 ### given list of int with city indices, create csv file
@@ -278,7 +290,6 @@ def main():
     createCSV(solution)
 
     prob_open.close()    
-
 
 
 
