@@ -188,12 +188,14 @@ def sampleSUS(parents, N):
             r += 1/N
             current_member += 1
         i += 1
+    printPretty("Sampled using SUS")
     return selected
 
 ### Make pairs of Parent()s, randomly and uniformly pick some part and switch the same number sequence retaining its orders
 ### input: list of Parent(), crossover rate(0~1.0)
 ### output: list of Parent()
 def orderedCrossover(selected, r)
+    printPretty("Crossovering...")
     childs = []
     pairs = makePair(selected)
     for pair in pairs:
@@ -203,6 +205,7 @@ def orderedCrossover(selected, r)
         else:
             child = breed(pair[0], pair[1], r)
             child.append(child)
+    printPretty("Crossovered")
     return childs
 
     
@@ -211,10 +214,12 @@ def orderedCrossover(selected, r)
 ### input: list of Parent(), probability r(0~1.0)
 ### output: list of Parent()
 def mutate(crossovered, r):
+    printPretty("Mutating...")
     for parent in crossovered:
         li = parent.getList()
         mutated_li = mutateIndividual(li, r)
         parent.setList(mutated_li)
+    printPretty("Mutated")
     return 1
 
 
