@@ -120,6 +120,12 @@ def mutateIndividual(li, r):
             li[n2] = swap1
     return li
 
+### align given list of Parent() with respect to their fitness value in decreasing order
+### input: list of Parent()
+### output: list of Parent()
+def alignFitness(parents):
+    return sorted(parents, key = lambda parent : parent.getFitness(), reverse = True)    
+
 
 ################################################# MAJOR FUNCTION #################################################
 ### get initial population using random shuffle. Number of initial population able to assign.
@@ -209,12 +215,25 @@ def mutate(crossovered, r):
         li = parent.getList()
         mutated_li = mutateIndividual(li, r)
         parent.setList(mutated_li)
+    return 1
 
 
-### maintain M best from Parents, get rid of M worst from Current
-### input: list of Parent()
+### maintain M best from Parents, get rid of M worst from Child
+### input: list of Parent(), list of Parent(), percentage of elite(0~1.0)
 ### output: list of Parent()
-def chooseBestGeneration(mutated)
+def chooseBestGeneration(parent, child, m):
+    printPretty("Choosing the best generation...")
+    best = []
+    l = len(parent)
+    numElite = int(l*m)
+    aligned_parent = alignFitness(parent)
+    best_parent = aligned_parent[:numElite]
+    aligned_child = alignFitness(child)
+    best_child = aligned_child[:-numElite]
+    
+    best = best_parent + best_child
+    printPretty("Chose the best generation")
+    return best
 
 
 
@@ -223,10 +242,12 @@ def chooseBestGeneration(mutated)
 ### input: list of Parent()
 ### output: Parent()
 def chooseBestOne(pop):
+    printPretty("Choosing the best one...")
     res = pop[0]
     for parent in pop:
         if parent.getFitness() > res.getFitness():
             res = parent
+    printPretty("Chose the best one")
     return res
 
 
@@ -234,11 +255,13 @@ def chooseBestOne(pop):
 ### input: list of int
 ### output: .csv with single column city indices
 def createCSV(arg):
+    printPretty("Creating CSV file...")
     len = len(arg)
     csv = open('solution_{0}.csv'.format(str(datetime.datetime.now().time())[:-7]), 'w')
     for i in range(len):
         data = arg[i]
         csv.write(data)
+    printPretty("Created CSV file")
     return csv
 
 
@@ -248,10 +271,11 @@ def createCSV(arg):
 ### input: -
 ### output: .csv
 def main():
-    prob = sys.argv[1]
+    prob = sys.argv[1] # file name
     prob_open = open(prob, 'r')
-    pop = sys.argv[2]
-    loop = sys.argv[3]
+    pop = sys.argv[2] # number of members in population
+    loop = sys.argv[3] # number of loop, stop criterion
+    elite = sys.argv[4] # elitism percentage to hold til the next generation
 
     lines = prob_open.readlines()
     len = lines[3]
@@ -281,15 +305,17 @@ def main():
             parents.append()
         sumFitness = sumFitness(parents)
         parents = computeFPS(parents, sumFitness)
-        selected = sampleSUS(parents, pop)
-        crossovered = orderedCrossover(selected)
-        mutated = mutate(crossovered)
-        population = chooseBestGeneration(mutated)
+        selected_parent = sampleSUS(parents, pop)
+        crossovered_child = orderedCrossover(selected_parent)
+        mutated_parent = mutate(selected_parent)
+        mutated_child = mutate(crossovered_child)
+        population = chooseBestGeneration(mutated_parent, mutated_child, elite)
     theBestOne = chooseBestOne(population)
     solution = parentToInt(theBestOne)
     createCSV(solution)
 
-    prob_open.close()    
+    prob_open.close()
+    return 1
 
 
 
