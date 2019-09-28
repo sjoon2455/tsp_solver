@@ -2,6 +2,7 @@
 
 ### li: list of City(), fit: fitness value
 class Parent:
+    prob = 0
     def __init__(self, li, fit):
         self.li = li
         self.fit = fit
@@ -12,6 +13,9 @@ class Parent:
     def setProbability(self, prob):
         self.prob = prob
         return 1
+    
+    def getProbability(self):
+        return self.prob
     
     def getList(self):
         return self.li

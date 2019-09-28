@@ -4,17 +4,20 @@ import random
 import datetime
 from cityClass import City
 from parentClass import Parent
+from printPretty import printPretty
 
 ################################################# MAJOR FUNCTION #################################################
 ### get initial population using random shuffle. Number of initial population able to assign.
 ### input: number of cities, num of initial population
 ### output: list of list of int(city)
 def initialPopulation(num, pop):
+    printPretty("Generating intial population...")
     population = []
     alignedList = list(range(1, num+1))
     for i in list(range(1, pop+1)):
         random.shuffle(alignedList)
         population.append(alignedList)
+    printPretty("Generated intial population")
     return population
 
 
@@ -22,6 +25,7 @@ def initialPopulation(num, pop):
 ### input: list of int
 ### output: int
 def computeFitness(route, cities):
+    printPretty("Computing Fitness...")
     distance = 0
     actualRoute = [cities[i-1] for i in route]
     length = len(actualRoute)
@@ -31,9 +35,52 @@ def computeFitness(route, cities):
             distance += actualRoute[i].getDistance(actualRoute[0])
         else:
             distance += actualRoute[i].getDistance(actualRoute[i+1])
+    printPretty("Computed FPS")
     return distance
         
 
+### compute each probabilty of being selected proportional to each fitness value
+### input: list of Parent(), total sum of fitness
+### output: list of Parent()
+def computeFPS(parents, sumFitness):
+    printPretty("Computing FPS...")
+    for parent in parents:
+        prob = parent.getFitness() / sumFitness
+        parent.setProbability(prob)
+    printPretty("Computed FPS")
+    return parents
+
+
+### 룰렛 팔 N개로 N개를 뽑음
+### input: list of Parent(), number of next generation
+### ouput: list of Parent()
+def sampleSUS(parents, N):
+    printPretty("Sampling using SUS...")
+    selected = [0 for x in range(N)]
+    cumul_prob = getCumulProb(parents)
+    current_member = 0
+    i = 0
+    r = random.uniform(0, 1/N)
+    while(current_member <= N-1):
+        while(r <= cumul_prob[i]):
+            selected[current_member] = parents[i]
+            r += 1/N
+            current_member += 1
+        i += 1
+    return selected
+
+### Make pairs of Parent()s, randomly and uniformly pick some part and switch the same number sequence retaining its orders
+### input: list of Parent(), crossover rate(0~1.0)
+### output: list of Parent()
+def orderedCrossover(selected, r)
+'''
+### Not sure yet...
+def mutate(crossovered, r)
+'''
+### maintain M best from Parents, get rid of M worst from Current
+### input: list of Parent()
+### output: list of Parent()
+def chooseBestGeneration(mutated)
 
 
 
@@ -71,6 +118,20 @@ def parentToInt(solution)
         res.append(index)
     return res
 
+### get cumulative probability of given Parent()s as a list
+### input: list of Parent()
+### output: list of float
+def getCumulProb(parents):
+    res = []
+    i = 0
+    for parent in parents:
+        prob = parent.getProbability()
+        if i == 0:
+            res[i] = prob
+        else:
+            res[i] = res[i-1] + prob
+        i += 1
+    return res
 
 ################################################# MAIN FUNCTION #################################################
 ### main function
@@ -122,27 +183,6 @@ def main():
 
 
 
-### compute each probabilty of being selected proportional to each fitness value
-### input: list of list of Parent(), total sum of fitness
-### output: list of list of Parent()
-def computeFPS(parents, sumFitness)
 
-### 룰렛 팔 N개로 N개를 뽑음
-### input: list of list of Parent(), number of next generation
-### ouput: list of list of Parent()
-def sampleSUS(parents, N)
-
-### Make pairs of Parent()s, randomly and uniformly pick some part and switch the same number sequence retaining its orders
-### input: list of list of Parent(), crossover rate(0~1.0)
-### output: list of list of Parent()
-def orderedCrossover(selected, r)
-
-### 
-def mutate(crossovered, r)
-
-### maintain M best from Parents, get rid of M worst from Current
-### input: list of list of Parent()
-### output: list of list of Parent()
-def chooseBestGeneration(mutated)
-
-main()
+if __name__ == "__main__"
+    main()
