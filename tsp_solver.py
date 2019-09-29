@@ -4,7 +4,7 @@ import random
 import datetime
 from cityClass import City
 from parentClass import Parent
-from geneIndexClass import Geneindex
+from geneIndexClass import GeneIndex
 from printPretty import printPretty
 import math
 
@@ -23,7 +23,7 @@ def sumFitness(parents):
 ### list of parent -> list of city indices
 ### input: list of parent
 ### output: list of int
-def parentToInt(solution)
+def parentToInt(solution):
     res = []
     for parent in solution:
         index = parent.getList().getIndex()
@@ -73,7 +73,7 @@ def breed(dad, mom, r):
     #type check necessary
     for i in dadRoute:
         if isPicked(i, r):
-            a = Geneindex(i, index)
+            a = GeneIndex(i, index)
             crossover_cities.append(a)
             momRoute.replace(i, 0)
         index += 1
@@ -85,7 +85,7 @@ def breed(dad, mom, r):
 ### randomly create pairs of Parent()s
 ### input: list of Parent()
 ### output: list of pair of Parent()
-def makePair(parents)
+def makePair(parents):
     pairs = []
     length = len(parents)
     if length % 2 == 0:
@@ -194,7 +194,7 @@ def sampleSUS(parents, N):
 ### Make pairs of Parent()s, randomly and uniformly pick some part and switch the same number sequence retaining its orders
 ### input: list of Parent(), crossover rate(0~1.0)
 ### output: list of Parent()
-def orderedCrossover(selected, r)
+def orderedCrossover(selected, r):
     printPretty("Crossovering...")
     childs = []
     pairs = makePair(selected)
@@ -324,5 +324,5 @@ def main():
 
 
 
-if __name__ == "__main__"
+if __name__ == "__main__":
     main()
