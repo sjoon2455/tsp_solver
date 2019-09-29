@@ -1,3 +1,6 @@
+####JUSTFORBACKUP####
+
+
 # coding: utf-8
 import sys
 import random
@@ -7,8 +10,6 @@ from cityClass import City
 from parentClass import Parent
 from geneIndexClass import GeneIndex
 from printPretty import printPretty
-import matplotlib.pyplot as plt
-import numpy as np
 
 
 ################################################# HELPER FUNCTION #################################################
@@ -21,16 +22,6 @@ def sumFitness(parents):
         fit = i.getFitness()
         res += fit
     return res
-
-### get fitness values of all individual chromosomes in increasing order
-### input: list of Parent
-### output: list of float
-def getFitnessOfAll(parents):
-    res = []
-    for parent in parents:
-        res.append(parent.getFitness())
-    return sorted(res)
-
 
 ### Parent() -> list of city indices
 ### input: Parent()
@@ -122,7 +113,7 @@ def makePair(parents):
             pairs.append(dadAndMom)
         
     else:
-        while(len(parentsCopied) != 1):
+        while(len(parents) != 1):
             dad = random.choice(parentsCopied)
             parentsCopied.remove(dad)
             mom = random.choice(parentsCopied)
@@ -193,6 +184,10 @@ def initialPopulation(num, pop, cities):
 def computeFitness(route, cities):
     #printPretty("Computing Fitness...")
     distance = 0
+    #if not isinstance(route, list):
+        #print(route)
+    #routeList = route.getList()
+    #actualRoute = [cities[i-1] for i in routeList] # list of City()
     actualRoute = [cities[i-1] for i in route] # list of City()
     length = len(actualRoute)
     # starts with i=0
@@ -206,21 +201,15 @@ def computeFitness(route, cities):
         
 
 ### compute each probabilty of being selected proportional to each fitness value
-### input: list of Parent(), total sum of fitness, list of float
+### input: list of Parent(), total sum of fitness
 ### output: list of Parent()
-def computeFPS(parents, sumFitness, everyFitness):
+def computeFPS(parents, sumFitness):
     #printPretty("Computing FPS...")
-    minimum = everyFitness[0]
-    num = len(parents)
     for parent in parents:
-        index = getIndexList(everyFitness, parent.getFitness())
-        prob = float((everyFitness[-(index+1)]-minimum) / (sumFitness-minimum*num))
-        #prob = float(parent.getFitness() / sumFitness)
+        prob = parent.getFitness() / sumFitness
         parent.setProbability(prob)
     #printPretty("Computed FPS")
     return parents
-
-
 
 
 ### 룰렛 팔 N개로 N개를 뽑음
@@ -257,10 +246,7 @@ def orderedCrossover(selected, r, pop):
         for pair in pairs:
             numChild += 1
             printPretty("Creating Child #{0}...".format(numChild))
-            if len(pair) == 2:
-                child = breed(pair[0], pair[1], r)
-            else:
-                child = pair[0]
+            child = breed(pair[0], pair[1], r)
             childs.append(child)
     printPretty("Crossovered")
     return childs
@@ -330,20 +316,6 @@ def chooseBestOne(pop):
     return res
 
 
-### draw plot end of every loop
-### input: list of int, list of float, int, float
-### output: -
-def drawPlot(x, y, count, theBestFitness):
-    
-    x.append(count)
-    y.append(theBestFitness)
-    plt.plot(count, theBestFitness, "ro-")
-    plt.show()
-    plt.pause(0.0001)
-    
-    
-
-
 ### given list of int with city indices, create csv file
 ### input: list of int
 ### output: .csv with single column city indices
@@ -372,16 +344,6 @@ def main():
     crossoverRate = float(sys.argv[5]) # percentage of being crossovered
     mutationRate = float(sys.argv[6]) # percentage of being mutated
     
-    ### for plotting
-    plt.ion()
-    fig=plt.figure()
-    plt.axis([0,loop,0,100000000])
-    plt.ylim(bottom = 80000000)
-    plt.yscale('log')
-    plt.ylabel('Distance')
-    plt.xlabel('Generation')
-    xlist=list()
-    ylist=list()
 
     lines = prob_open.readlines()
     len = lines[3]
@@ -399,13 +361,12 @@ def main():
 
     # main loop
     count = 0
-    population = initialPop # list of Parent()
+    population = initialPop
     while count < loop:
         count += 1
         selected = []
-        sumfit = sumFitness(population)
-        everyFitness = getFitnessOfAll(population)
-        population = computeFPS(population, sumfit, everyFitness)
+        sum = sumFitness(population)
+        population = computeFPS(population, sum)
         #print("fps computed: ", population)
         selected_parent = sampleSUS(population, int(0.5*pop))
         #print("sus computed: ", selected_parent)
@@ -421,35 +382,17 @@ def main():
         #print("population: ", population)
         theBestOne = chooseBestOne(population) # Parent()
         theBestFitness = float(theBestOne.getFitness())
-        drawPlot(xlist, ylist, count, theBestFitness)
         print("THE BEST of GENERATION #{0}: {1}".format(count, theBestFitness))
-    while True:
-        plt.pause(0.05)
     solution = parentToInt(theBestOne)
     createCSV(solution)
 
     prob_open.close()
     return 1
 
-
-
-
-
-
 if __name__ == "__main__":
     main()
 
 
 '''
-def func(li):
-    for i in li:
-        index = getIndexList(li, i)
-        a = li[-(index+1)]
-        print(a)
-    return 1
-    
-
-if __name__ == "__main__":
-    func([1, 2, 3, 4, 5])
-    func([1, 2, 3, 4])
-'''
+if __name__ != "__main__":
+''' 
