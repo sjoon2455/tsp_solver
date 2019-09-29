@@ -40,12 +40,12 @@ def getCumulProb(parents):
         prob = parent.getProbability()
         if i == 0:
             res.append(prob)
-            #res[i] = prob
+    
         else:
             res.append(res[-1]+prob)
-            #res[i] = res[i-1] + prob
+    
         i += 1
-    #print(res, type(res))
+    
     return res
 
 ### Check if picked with a probability of r
@@ -101,8 +101,7 @@ def makePair(parents):
     pairs = []
     length = len(parents)
     parentsCopied = parents.copy()
-    #print("parentscopied: ", parentsCopied)
-    #print("CHOICE: ", random.choice(parentsCopied))
+    
     if length % 2 == 0:
         while(len(parentsCopied) != 0):
             dad = random.choice(parentsCopied)
@@ -113,7 +112,7 @@ def makePair(parents):
             dadAndMom.append(dad)
             dadAndMom.append(mom)
             pairs.append(dadAndMom)
-        #print(pairs)
+        
     else:
         while(len(parents) != 1):
             dad = random.choice(parentsCopied)
@@ -157,15 +156,18 @@ def alignFitness(parents):
 ################################################# MAJOR FUNCTION #################################################
 ### get initial population using random shuffle. Number of initial population able to assign.
 ### input: number of cities, num of initial population
-### output: list of list of Parent()
+### output: list of Parent()
 def initialPopulation(num, pop, cities):
     printPretty("Generating intial population...")
     population = []
     alignedList = list(range(1, num+1))
     # generate random permutated lists
-    for i in list(range(1, pop+1)):
+    count = 0
+    while count < pop:
         random.shuffle(alignedList) # not aligned anymore
-        population.append(alignedList) 
+        population.append(alignedList)
+        count += 1
+        
     
     for route in population: # route: list of int
         fitness = computeFitness(route, cities)
@@ -184,6 +186,9 @@ def initialPopulation(num, pop, cities):
 def computeFitness(route, cities):
     printPretty("Computing Fitness...")
     distance = 0
+    #print(route)
+    #routeList = route.getList()
+    #actualRoute = [cities[i-1] for i in routeList] # list of City()
     actualRoute = [cities[i-1] for i in route] # list of City()
     length = len(actualRoute)
     # starts with i=0
@@ -361,7 +366,6 @@ def main():
     while count < loop:
         count += 1
         selected = []
-        
         sum = sumFitness(parents)
         parents = computeFPS(parents, sum)
         print("fps computed: ", parents)
@@ -390,7 +394,6 @@ if __name__ == "__main__":
     main()
 
 
-
+'''
 if __name__ != "__main__":
-    a = [1, 2, 3]
-    print(ali(a))
+''' 
