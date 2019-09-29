@@ -2,6 +2,7 @@
 import sys
 import random
 import datetime
+import time
 from cityClass import City
 from parentClass import Parent
 from geneIndexClass import GeneIndex
@@ -44,6 +45,7 @@ def getCumulProb(parents):
             res.append(res[-1]+prob)
             #res[i] = res[i-1] + prob
         i += 1
+    #print(res, type(res))
     return res
 
 ### Check if picked with a probability of r
@@ -98,24 +100,33 @@ def breed(dad, mom, r):
 def makePair(parents):
     pairs = []
     length = len(parents)
+    parentsCopied = parents.copy()
+    #print("parentscopied: ", parentsCopied)
+    #print("CHOICE: ", random.choice(parentsCopied))
     if length % 2 == 0:
-        while(len(parents) != 0):
-            dad = random.choice(parents)
-            parents.remove(dad)
-            mom = random.choice(parents)
-            parents.remove(mom)
+        while(len(parentsCopied) != 0):
+            dad = random.choice(parentsCopied)
+            parentsCopied.remove(dad)
+            mom = random.choice(parentsCopied)
+            parentsCopied.remove(mom)
             dadAndMom = list()
             dadAndMom.append(dad)
             dadAndMom.append(mom)
             pairs.append(dadAndMom)
+        #print(pairs)
     else:
         while(len(parents) != 1):
-            dad = random.choice(parents)
-            parents.remove(dad)
-            mom = random.choice(parents)
-            parents.remove(mom)
-            pairs.append(list(dad, mom))
-        pairs.append(list(parents[0]))
+            dad = random.choice(parentsCopied)
+            parentsCopied.remove(dad)
+            mom = random.choice(parentsCopied)
+            parentsCopied.remove(mom)
+            dadAndMom = list()
+            dadAndMom.append(dad)
+            dadAndMom.append(mom)
+            pairs.append(dadAndMom)
+        alone = list()
+        alone.append(parentsCopied[0])
+        pairs.append(alone)
     return pairs
 
 
@@ -205,17 +216,20 @@ def sampleSUS(parents, N):
     return selected
 
 ### Make pairs of Parent()s, randomly and uniformly pick some part and switch the same number sequence retaining its orders
-### input: list of Parent(), crossover rate(0~1.0)
+### input: list of Parent(), crossover rate(0~1.0), total population int
 ### output: list of Parent()
-def orderedCrossover(selected, r):
+def orderedCrossover(selected, r, pop):
     printPretty("Crossovering...")
     childs = []
-    pairs = makePair(selected)
-    for pair in pairs:
-        if len(pair) % 2 == 1:
-            child = pair[0]
-            childs.append(child)
-        else:
+    numChild = 0
+    numPop = int(0.5*pop if pop%2==0 else 0.5*pop+1)
+    #print(numPop) # 6
+    while numChild < numPop:
+        #print("SELECTED: ", selected)
+        pairs = makePair(selected)
+        for pair in pairs:
+            numChild += 1
+            print(numChild)
             child = breed(pair[0], pair[1], r)
             childs.append(child)
     printPretty("Crossovered")
@@ -230,10 +244,11 @@ def mutate(crossovered, r):
     printPretty("Mutating...")
     for parent in crossovered:
         li = parent.getList()
+        #print("getlist: ", li)
         mutated_li = mutateIndividual(li, r)
         parent.setList(mutated_li)
     printPretty("Mutated")
-    return 1
+    return crossovered
 
 
 ### maintain M best from Parents, get rid of M worst from Child
@@ -246,9 +261,10 @@ def chooseBestGeneration(parent, child, m):
     numElite = int(l*m)
     aligned_parent = alignFitness(parent)
     best_parent = aligned_parent[:numElite]
+    print("best parent: ", best_parent)
     aligned_child = alignFitness(child)
     best_child = aligned_child[:-numElite]
-    
+    print("best child: ", best_child)
     best = best_parent + best_child
     printPretty("Chose the best generation")
     return best
@@ -326,11 +342,17 @@ def main():
             parents.append(parent)
         sum = sumFitness(parents)
         parents = computeFPS(parents, sum)
-        selected_parent = sampleSUS(parents, pop)
-        crossovered_child = orderedCrossover(selected_parent, crossoverRate)
+        print("fps computed: ", parents)
+        selected_parent = sampleSUS(parents, int(0.5*pop))
+        print("sus computed: ", selected_parent)
+        crossovered_child = orderedCrossover(selected_parent, crossoverRate, pop)
+        print("crossovered: ", crossovered_child)
         mutated_parent = mutate(selected_parent, mutationRate)
+        print("mutated parent: ", mutated_parent)
         mutated_child = mutate(crossovered_child, mutationRate)
+        print("mutated child: ", mutated_child)
         population = chooseBestGeneration(mutated_parent, mutated_child, elite)
+        print("population: ", population)
     theBestOne = chooseBestOne(population)
     solution = parentToInt(theBestOne)
     createCSV(solution)
@@ -338,7 +360,13 @@ def main():
     prob_open.close()
     return 1
 
+if __name__ != "__main__":
+    main()
+
+def ali(li):
+    return sorted(li, key = lambda a : a+1, reverse = True)    
 
 
 if __name__ == "__main__":
-    main()
+    a = [1, 2, 3]
+    print(ali(a))
