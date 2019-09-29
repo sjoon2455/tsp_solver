@@ -179,7 +179,7 @@ def initialPopulation(num, pop, cities):
 ### input: list of int, list of City()
 ### output: int
 def computeFitness(route, cities):
-    printPretty("Computing Fitness...")
+    #printPretty("Computing Fitness...")
     distance = 0
     #if not isinstance(route, list):
         #print(route)
@@ -193,7 +193,7 @@ def computeFitness(route, cities):
             distance += actualRoute[i].getDistance(actualRoute[0])
         else:
             distance += actualRoute[i].getDistance(actualRoute[i+1])
-    printPretty("Computed FPS")
+    #printPretty("Computed FPS")
     return distance
         
 
@@ -242,7 +242,7 @@ def orderedCrossover(selected, r, pop):
         pairs = makePair(selected)
         for pair in pairs:
             numChild += 1
-            printPretty("Creating Child #{0}".format(numChild))
+            printPretty("Creating Child #{0}...".format(numChild))
             child = breed(pair[0], pair[1], r)
             childs.append(child)
     printPretty("Crossovered")
@@ -322,7 +322,7 @@ def createCSV(arg):
     csv = open('solution_{0}.csv'.format(str(datetime.datetime.now().time())[:-7]), 'w')
     for i in range(length):
         data = str(arg[i])
-        csv.write(data)
+        csv.write(data+"\n")
     printPretty("Created CSV file")
     return csv
 
