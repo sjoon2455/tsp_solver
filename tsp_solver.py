@@ -154,25 +154,33 @@ def alignFitness(parents):
 ################################################# MAJOR FUNCTION #################################################
 ### get initial population using random shuffle. Number of initial population able to assign.
 ### input: number of cities, num of initial population
-### output: list of list of int(city)
-def initialPopulation(num, pop):
+### output: list of list of Parent()
+def initialPopulation(num, pop, cities):
     printPretty("Generating intial population...")
     population = []
     alignedList = list(range(1, num+1))
+    # generate random permutated lists
     for i in list(range(1, pop+1)):
-        random.shuffle(alignedList)
-        population.append(alignedList)
+        random.shuffle(alignedList) # not aligned anymore
+        population.append(alignedList) 
+    
+    for route in population: # route: list of int
+        fitness = computeFitness(route, cities)
+        parent = Parent(route, fitness)
+        population.remove(route)
+        population.append(parent)
+
     printPretty("Generated intial population")
     return population
 
 
 ### calculate fitness: total distance between cities
-### input: list of int
+### input: list of int, list of City()
 ### output: int
 def computeFitness(route, cities):
     printPretty("Computing Fitness...")
     distance = 0
-    actualRoute = [cities[i-1] for i in route]
+    actualRoute = [cities[i-1] for i in route] # list of City()
     length = len(actualRoute)
     # starts with i=0
     for i in range(length):
@@ -258,14 +266,16 @@ def chooseBestGeneration(parent, child, m):
     printPretty("Choosing the best generation...")
     best = []
     l = len(parent)
-    numElite = int(l*m)
+    #numElite = int(l*m)
+    numElite = 2
     aligned_parent = alignFitness(parent)
     best_parent = aligned_parent[:numElite]
-    print("best parent: ", best_parent)
+    #print("best parent: ", best_parent)
     aligned_child = alignFitness(child)
     best_child = aligned_child[:-numElite]
-    print("best child: ", best_child)
+    #print("best child: ", best_child)
     best = best_parent + best_child
+    #print(best)
     printPretty("Chose the best generation")
     return best
 
@@ -326,20 +336,15 @@ def main():
         x = int(float(lines[i][1]))
         y = int(float(lines[i][2]))
         cities.append(City(i+1, x, y))
-    initialPop = initialPopulation(num, pop)
-    
+    initialPop = initialPopulation(num, pop, cities)
+
     # main loop
     count = 0
     population = initialPop
     while count < loop:
         count += 1
         selected = []
-        parents = []
-        #route: [3, 5, 61, 24, 6, ..., 2412]
-        for route in population:
-            fitness = computeFitness(route, cities)
-            parent = Parent(route, fitness)
-            parents.append(parent)
+        
         sum = sumFitness(parents)
         parents = computeFPS(parents, sum)
         print("fps computed: ", parents)
@@ -351,22 +356,23 @@ def main():
         print("mutated parent: ", mutated_parent)
         mutated_child = mutate(crossovered_child, mutationRate)
         print("mutated child: ", mutated_child)
-        population = chooseBestGeneration(mutated_parent, mutated_child, elite)
+        여기서 피트니스 업데이트 해주고
+        population = chooseBestGeneration(mutated_parent, mutated_child, elite) # list of Parent()
         print("population: ", population)
-    theBestOne = chooseBestOne(population)
+        theBestOne = chooseBestOne(population) # Parent()
+        theBestFitness = float(theBestOne.getFitness())
+        print("THE BEST of GENERATION #{0}: {1}".format(count, theBestFitness))
     solution = parentToInt(theBestOne)
     createCSV(solution)
 
     prob_open.close()
     return 1
 
-if __name__ != "__main__":
+if __name__ == "__main__":
     main()
 
-def ali(li):
-    return sorted(li, key = lambda a : a+1, reverse = True)    
 
 
-if __name__ == "__main__":
+if __name__ != "__main__":
     a = [1, 2, 3]
     print(ali(a))
