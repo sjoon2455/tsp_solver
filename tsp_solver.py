@@ -20,15 +20,11 @@ def sumFitness(parents):
         res += fit
     return res
 
-### list of parent -> list of city indices
-### input: list of parent
+### Parent() -> list of city indices
+### input: Parent()
 ### output: list of int
 def parentToInt(solution):
-    res = []
-    for parent in solution:
-        index = parent.getList().getIndex()
-        res.append(index)
-    return res
+    return solution.getList()
 
 ### get cumulative probability of given Parent()s as a list
 ### input: list of Parent()
@@ -322,10 +318,10 @@ def chooseBestOne(pop):
 ### output: .csv with single column city indices
 def createCSV(arg):
     printPretty("Creating CSV file...")
-    len = len(arg)
+    length = len(arg)
     csv = open('solution_{0}.csv'.format(str(datetime.datetime.now().time())[:-7]), 'w')
-    for i in range(len):
-        data = arg[i]
+    for i in range(length):
+        data = str(arg[i])
         csv.write(data)
     printPretty("Created CSV file")
     return csv
@@ -368,19 +364,19 @@ def main():
         selected = []
         sum = sumFitness(population)
         population = computeFPS(population, sum)
-        print("fps computed: ", population)
+        #print("fps computed: ", population)
         selected_parent = sampleSUS(population, int(0.5*pop))
-        print("sus computed: ", selected_parent)
+        #print("sus computed: ", selected_parent)
         crossovered_child = orderedCrossover(selected_parent, crossoverRate, pop)
-        print("crossovered: ", crossovered_child)
+        #print("crossovered: ", crossovered_child)
         mutated_parent = mutate(selected_parent, mutationRate)
-        print("mutated parent: ", mutated_parent)
+        #print("mutated parent: ", mutated_parent)
         mutated_child = mutate(crossovered_child, mutationRate)
-        print("mutated child: ", mutated_child)
+        #print("mutated child: ", mutated_child)
         mutated_parent = updateFitness(mutated_parent, cities)
         mutated_child = updateFitness(mutated_child, cities)
         population = chooseBestGeneration(mutated_parent, mutated_child, elite) # list of Parent()
-        print("population: ", population)
+        #print("population: ", population)
         theBestOne = chooseBestOne(population) # Parent()
         theBestFitness = float(theBestOne.getFitness())
         print("THE BEST of GENERATION #{0}: {1}".format(count, theBestFitness))

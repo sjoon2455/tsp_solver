@@ -1,6 +1,6 @@
 #coding: utf-8
 
-### li: list of City(), fit: fitness value
+### li: list of int, fit: fitness value
 class Parent:
     prob = 0
     def __init__(self, li, fit):
