@@ -11,7 +11,7 @@ from printPretty import printPretty
 
 ################################################# HELPER FUNCTION #################################################
 ### add all fitness values of current population
-### input: list of parents
+### input: list of Parent()
 ### output: int
 def sumFitness(parents):
     res = 0
@@ -167,13 +167,12 @@ def initialPopulation(num, pop, cities):
         random.shuffle(alignedList) # not aligned anymore
         population.append(alignedList)
         count += 1
-        
-    
+
     for route in population: # route: list of int
         fitness = computeFitness(route, cities)
         parent = Parent(route, fitness)
-        population.remove(route)
-        population.append(parent)
+        index = getIndexList(population, route)
+        population[index] = parent
 
     printPretty("Generated intial population")
     return population
@@ -186,7 +185,8 @@ def initialPopulation(num, pop, cities):
 def computeFitness(route, cities):
     printPretty("Computing Fitness...")
     distance = 0
-    #print(route)
+    #if not isinstance(route, list):
+        #print(route)
     #routeList = route.getList()
     #actualRoute = [cities[i-1] for i in routeList] # list of City()
     actualRoute = [cities[i-1] for i in route] # list of City()
@@ -366,10 +366,10 @@ def main():
     while count < loop:
         count += 1
         selected = []
-        sum = sumFitness(parents)
-        parents = computeFPS(parents, sum)
-        print("fps computed: ", parents)
-        selected_parent = sampleSUS(parents, int(0.5*pop))
+        sum = sumFitness(population)
+        population = computeFPS(population, sum)
+        print("fps computed: ", population)
+        selected_parent = sampleSUS(population, int(0.5*pop))
         print("sus computed: ", selected_parent)
         crossovered_child = orderedCrossover(selected_parent, crossoverRate, pop)
         print("crossovered: ", crossovered_child)
