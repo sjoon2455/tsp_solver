@@ -10,6 +10,10 @@ class Parent:
     def getFitness(self):
         return self.fit
     
+    def setFitness(self, fitness):
+        self.fit = fitness
+        return 1
+    
     def setProbability(self, prob):
         self.prob = prob
         return 1

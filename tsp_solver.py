@@ -144,6 +144,9 @@ def mutateIndividual(li, r):
             li[n2] = swap1
     return li
 
+
+
+
 ### align given list of Parent() with respect to their fitness value in decreasing order
 ### input: list of Parent()
 ### output: list of Parent()
@@ -172,6 +175,7 @@ def initialPopulation(num, pop, cities):
 
     printPretty("Generated intial population")
     return population
+
 
 
 ### calculate fitness: total distance between cities
@@ -257,6 +261,19 @@ def mutate(crossovered, r):
         parent.setList(mutated_li)
     printPretty("Mutated")
     return crossovered
+
+
+
+### update fitness for each Parent()
+### input: list of Parent()
+### output: list of Parent()
+def updateFitness(parents, cities):
+    printPretty("Updating fitness of the mutated...")
+    for parent in parents:
+        fit = computeFitness(parent.getList(), cities)
+        parent.setFitness(fit)
+    printPretty("Updated fitness of the mutated")
+    return parents
 
 
 ### maintain M best from Parents, get rid of M worst from Child
@@ -356,7 +373,8 @@ def main():
         print("mutated parent: ", mutated_parent)
         mutated_child = mutate(crossovered_child, mutationRate)
         print("mutated child: ", mutated_child)
-        여기서 피트니스 업데이트 해주고
+        mutated_parent = updateFitness(mutated_parent, cities)
+        mutated_child = updateFitness(mutated_child, cities)
         population = chooseBestGeneration(mutated_parent, mutated_child, elite) # list of Parent()
         print("population: ", population)
         theBestOne = chooseBestOne(population) # Parent()
