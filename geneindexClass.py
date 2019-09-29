@@ -1,3 +1,4 @@
+#coding: utf-8
 class GeneIndex:
     def __init__(self, n, i):
         self.n = n

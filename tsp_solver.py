@@ -7,6 +7,8 @@ from cityClass import City
 from parentClass import Parent
 from geneIndexClass import GeneIndex
 from printPretty import printPretty
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 ################################################# HELPER FUNCTION #################################################
@@ -181,10 +183,6 @@ def initialPopulation(num, pop, cities):
 def computeFitness(route, cities):
     #printPretty("Computing Fitness...")
     distance = 0
-    #if not isinstance(route, list):
-        #print(route)
-    #routeList = route.getList()
-    #actualRoute = [cities[i-1] for i in routeList] # list of City()
     actualRoute = [cities[i-1] for i in route] # list of City()
     length = len(actualRoute)
     # starts with i=0
@@ -203,7 +201,7 @@ def computeFitness(route, cities):
 def computeFPS(parents, sumFitness):
     #printPretty("Computing FPS...")
     for parent in parents:
-        prob = parent.getFitness() / sumFitness
+        prob = float(parent.getFitness() / sumFitness)
         parent.setProbability(prob)
     #printPretty("Computed FPS")
     return parents
@@ -313,6 +311,20 @@ def chooseBestOne(pop):
     return res
 
 
+### draw plot end of every loop
+### input: list of int, list of float, int, float
+### output: -
+def drawPlot(x, y, count, theBestFitness):
+    
+    x.append(count)
+    y.append(theBestFitness)
+    plt.plot(count, theBestFitness, "ro-")
+    plt.show()
+    plt.pause(0.0001)
+    
+    
+
+
 ### given list of int with city indices, create csv file
 ### input: list of int
 ### output: .csv with single column city indices
@@ -341,6 +353,16 @@ def main():
     crossoverRate = float(sys.argv[5]) # percentage of being crossovered
     mutationRate = float(sys.argv[6]) # percentage of being mutated
     
+    ### for plotting
+    plt.ion()
+    fig=plt.figure()
+    plt.axis([0,loop,0,100000000])
+    plt.ylim(bottom = 1000000)
+    plt.yscale('log')
+    plt.ylabel('Distance')
+    plt.xlabel('Generation')
+    xlist=list()
+    ylist=list()
 
     lines = prob_open.readlines()
     len = lines[3]
@@ -362,8 +384,8 @@ def main():
     while count < loop:
         count += 1
         selected = []
-        sum = sumFitness(population)
-        population = computeFPS(population, sum)
+        sumfit = sumFitness(population)
+        population = computeFPS(population, sumfit)
         #print("fps computed: ", population)
         selected_parent = sampleSUS(population, int(0.5*pop))
         #print("sus computed: ", selected_parent)
@@ -379,17 +401,20 @@ def main():
         #print("population: ", population)
         theBestOne = chooseBestOne(population) # Parent()
         theBestFitness = float(theBestOne.getFitness())
+        drawPlot(xlist, ylist, count, theBestFitness)
         print("THE BEST of GENERATION #{0}: {1}".format(count, theBestFitness))
+    while True:
+        plt.pause(0.05)
     solution = parentToInt(theBestOne)
     createCSV(solution)
 
     prob_open.close()
     return 1
 
+
+
+
+
+
 if __name__ == "__main__":
     main()
-
-
-'''
-if __name__ != "__main__":
-''' 
