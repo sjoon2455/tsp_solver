@@ -201,11 +201,11 @@ def computeFitness(route, cities):
 ### input: list of Parent(), total sum of fitness
 ### output: list of Parent()
 def computeFPS(parents, sumFitness):
-    printPretty("Computing FPS...")
+    #printPretty("Computing FPS...")
     for parent in parents:
         prob = parent.getFitness() / sumFitness
         parent.setProbability(prob)
-    printPretty("Computed FPS")
+    #printPretty("Computed FPS")
     return parents
 
 
@@ -242,7 +242,7 @@ def orderedCrossover(selected, r, pop):
         pairs = makePair(selected)
         for pair in pairs:
             numChild += 1
-            print(numChild)
+            printPretty("Creating Child #{0}".format(numChild))
             child = breed(pair[0], pair[1], r)
             childs.append(child)
     printPretty("Crossovered")
