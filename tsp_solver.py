@@ -6,7 +6,6 @@ from cityClass import City
 from parentClass import Parent
 from geneIndexClass import GeneIndex
 from printPretty import printPretty
-import math
 
 
 ################################################# HELPER FUNCTION #################################################
@@ -39,9 +38,11 @@ def getCumulProb(parents):
     for parent in parents:
         prob = parent.getProbability()
         if i == 0:
-            res[i] = prob
+            res.append(prob)
+            #res[i] = prob
         else:
-            res[i] = res[i-1] + prob
+            res.append(res[-1]+prob)
+            #res[i] = res[i-1] + prob
         i += 1
     return res
 
@@ -50,7 +51,7 @@ def getCumulProb(parents):
 ### output: boolean
 def isPicked(num, r):
     sampleSpace = []
-    firstdecimal_r = math.round(r*10)/10
+    firstdecimal_r = round(r, 1)
     win = int(firstdecimal_r * 10)
     lose = 10 - win
     for i in range(win):
@@ -59,8 +60,16 @@ def isPicked(num, r):
         sampleSpace.append(0)
     lottery = random.choice(sampleSpace)
     return True if lottery == 1 else False
-    
 
+### get index of particular value
+### input: list of int, int
+### output: int
+def getIndexList(li, n):
+    index = 0
+    for i in li:
+        if i == n:
+            return index
+        index += 1
 
 ### breed a child b/w dad Parent() and mom Parent() with crossover rate r
 ### input: Parent(), Parent(), float(0~1)
@@ -75,7 +84,8 @@ def breed(dad, mom, r):
         if isPicked(i, r):
             a = GeneIndex(i, index)
             crossover_cities.append(a)
-            momRoute.replace(i, 0)
+            index = getIndexList(momRoute, i)
+            momRoute[index] = 0
         index += 1
     for j in crossover_cities:
         momRoute[j.getIndex()] = j.getNum()
@@ -94,7 +104,10 @@ def makePair(parents):
             parents.remove(dad)
             mom = random.choice(parents)
             parents.remove(mom)
-            pairs.append(list(dad, mom))
+            dadAndMom = list()
+            dadAndMom.append(dad)
+            dadAndMom.append(mom)
+            pairs.append(dadAndMom)
     else:
         while(len(parents) != 1):
             dad = random.choice(parents)
@@ -204,7 +217,7 @@ def orderedCrossover(selected, r):
             childs.append(child)
         else:
             child = breed(pair[0], pair[1], r)
-            child.append(child)
+            childs.append(child)
     printPretty("Crossovered")
     return childs
 
@@ -278,9 +291,12 @@ def createCSV(arg):
 def main():
     prob = sys.argv[1] # file name
     prob_open = open(prob, 'r')
-    pop = sys.argv[2] # number of members in population
-    loop = sys.argv[3] # number of loop, stop criterion
-    elite = sys.argv[4] # elitism percentage to hold til the next generation
+    pop = int(sys.argv[2]) # number of members in population
+    loop = int(sys.argv[3]) # number of loop, stop criterion
+    elite = float(sys.argv[4]) # elitism percentage to hold til the next generation
+    crossoverRate = float(sys.argv[5]) # percentage of being crossovered
+    mutationRate = float(sys.argv[6]) # percentage of being mutated
+    
 
     lines = prob_open.readlines()
     len = lines[3]
@@ -291,14 +307,14 @@ def main():
     #cities: list of City()
     cities = []
     for i in range(0, num):
-        x = int(lines[i][1])
-        y = int(lines[i][2])
+        x = int(float(lines[i][1]))
+        y = int(float(lines[i][2]))
         cities.append(City(i+1, x, y))
-    initialPopulation = initialPopulation(num, pop)
+    initialPop = initialPopulation(num, pop)
     
     # main loop
     count = 0
-    population = initialPopulation
+    population = initialPop
     while count < loop:
         count += 1
         selected = []
@@ -307,13 +323,13 @@ def main():
         for route in population:
             fitness = computeFitness(route, cities)
             parent = Parent(route, fitness)
-            parents.append()
-        sumFitness = sumFitness(parents)
-        parents = computeFPS(parents, sumFitness)
+            parents.append(parent)
+        sum = sumFitness(parents)
+        parents = computeFPS(parents, sum)
         selected_parent = sampleSUS(parents, pop)
-        crossovered_child = orderedCrossover(selected_parent)
-        mutated_parent = mutate(selected_parent)
-        mutated_child = mutate(crossovered_child)
+        crossovered_child = orderedCrossover(selected_parent, crossoverRate)
+        mutated_parent = mutate(selected_parent, mutationRate)
+        mutated_child = mutate(crossovered_child, mutationRate)
         population = chooseBestGeneration(mutated_parent, mutated_child, elite)
     theBestOne = chooseBestOne(population)
     solution = parentToInt(theBestOne)
