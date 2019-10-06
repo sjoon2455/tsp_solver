@@ -55,7 +55,7 @@ def getCumulProb(parents):
             res.append(res[-1]+prob)
     
         i += 1
-    
+    res[-1] = 1.0
     return res
 
 ### Check if picked with a probability of r
@@ -164,11 +164,11 @@ def mutateIndividual(li, r):
 
 
 
-### align given list of Parent() with respect to their fitness value in decreasing order
+### align given list of Parent() with respect to their fitness value in increasing order
 ### input: list of Parent()
 ### output: list of Parent()
 def alignFitness(parents):
-    return sorted(parents, key = lambda parent : parent.getFitness(), reverse = True)    
+    return sorted(parents, key = lambda parent : parent.getFitness())    
 
 
 ################################################# MAJOR FUNCTION #################################################
@@ -244,7 +244,7 @@ def sampleSUS(parents, N):
     pp("Sampling using SUS...")
     selected = [0 for x in range(N)] #[0, 0, ..., 0]
     cumul_prob = getCumulProb(parents)
-    print("누적도수분포: ", cumul_prob)
+    #print("누적도수분포: ", cumul_prob)
     current_member = 0
     i = 0
     r = random.uniform(0, 1/N)
@@ -254,8 +254,8 @@ def sampleSUS(parents, N):
             r += 1/N
             current_member += 1
         i += 1
-    for p in selected:
-        print("BEFORE AAAAAAA: ", p.getList()[:5])
+    #for p in selected:
+    #    print("BEFORE AAAAAAA: ", p.getList()[:5])
     pp("Sampled using SUS")
     return selected
 
@@ -264,11 +264,8 @@ def sampleSUS(parents, N):
 ### output: list of Parent()
 def orderedCrossover(selected, r, pop, cities):
     pp("Crossovering...")
-    for p in selected:
-        print("Before crossover: ", p.getList()[:5])
-    
-    
-    
+    #for p in selected:
+    #    print("Before crossover: ", p.getList()[:5])
     childs = []
     numChild = 0
     numPop = int(0.5*pop if pop%2==0 else 0.5*pop+1)
@@ -296,9 +293,9 @@ def mutate(crossovered, r):
     pp("Mutating...")
     for parent in crossovered:
         li = parent.getList()
-        print("before mutation getlist: ", li[:5])
+        #print("before mutation getlist: ", li[:5])
         mutated_li = mutateIndividual(li, r)
-        print("after mutation getlist: ", mutated_li[:5])
+        #print("after mutation getlist: ", mutated_li[:5])
         parent.setList(mutated_li)
     pp("Mutated")
     return crossovered
@@ -311,7 +308,7 @@ def mutate(crossovered, r):
 def updateFitness(parents, cities):
     pp("Updating fitness of the mutated...")
     for parent in parents:
-        print("!!!!!!!!!!!!!!!!!!!!!: ", parent.getList()[:6])
+        #print("!!!!!!!!!!!!!!!!!!!!!: ", parent.getList()[:6])
         fit = computeFitness(parent.getList(), cities)
         parent.setFitness(fit)
         print("updated fit: ",fit)
@@ -329,12 +326,13 @@ def chooseBestGeneration(parent, child, m):
     l = len(parent)
     #numElite = int(l*m)
     numElite = 2
+    
     aligned_parent = alignFitness(parent)
     best_parent = aligned_parent[:numElite]
-    #print("best parent: ", best_parent)
+    
     aligned_child = alignFitness(child)
     best_child = aligned_child[:-numElite]
-    #print("best child: ", best_child)
+    
     best = best_parent + best_child
     #print(best)
     pp("Chose the best generation")
@@ -348,12 +346,9 @@ def chooseBestGeneration(parent, child, m):
 ### output: Parent()
 def chooseBestOne(pop):
     pp("Choosing the best one...")
-    res = pop[0]
-    for parent in pop:
-        if parent.getFitness() > res.getFitness():
-            res = parent
+    sorted_pop = alignFitness(pop)
     pp("Chose the best one")
-    return res
+    return sorted_pop[0]
 
 
 ### draw plot end of every loop
@@ -422,13 +417,10 @@ def main():
         y = int(float(lines[i][2]))
         cities.append(City(i+1, x, y))
     initialPop = initialPopulation(num, pop, cities)
-    for k in initialPop:
-        print("IIIIIIIIIIIPOPPOPOPOPO: ", k.getList()[:5])
     # main loop
     count = 0
     population = initialPop # list of Parent()
-    for i in population:
-        print("POPPOPOPOPO: ", i.getList()[:5])
+    
     while count < loop:
         #print("Population of 2nd: ", population)
         count += 1
@@ -450,6 +442,7 @@ def main():
         #print("updated mutated parent: ", mutated_parent)
         mutated_child = updateFitness(mutated_child, cities)
         #print("updated mutated child: ", mutated_child)
+        ### 여기까지 오케이 ###
         population = chooseBestGeneration(mutated_parent, mutated_child, elite) # list of Parent()
         #print("population: ", population)
         theBestOne = chooseBestOne(population) # Parent()
