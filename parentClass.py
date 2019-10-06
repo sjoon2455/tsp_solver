@@ -12,11 +12,11 @@ class Parent:
     
     def setFitness(self, fitness):
         self.fit = fitness
-        return 1
+        #return 1
     
     def setProbability(self, prob):
         self.prob = prob
-        return 1
+        #return 1
     
     def getProbability(self):
         return self.prob
@@ -26,4 +26,4 @@ class Parent:
     
     def setList(self, newli):
         self.li = newli
-        return 1
+        #return 1

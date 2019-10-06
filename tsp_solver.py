@@ -6,18 +6,20 @@ import time
 from cityClass import City
 from parentClass import Parent
 from geneIndexClass import GeneIndex
-from printPretty import printPretty
+from printPretty import printPretty as pp
 import matplotlib.pyplot as plt
 import numpy as np
+import copy
 
 
 ################################################# HELPER FUNCTION #################################################
 ### add all fitness values of current population
 ### input: list of Parent()
-### output: int
+### output: float
 def sumFitness(parents):
     res = 0
     for i in parents:
+        print("BEFORE SUMFITNESS: ", i.getList()[:5])
         fit = i.getFitness()
         res += fit
     return res
@@ -84,22 +86,30 @@ def getIndexList(li, n):
 ### breed a child b/w dad Parent() and mom Parent() with crossover rate r
 ### input: Parent(), Parent(), float(0~1)
 ### output: Parent()
-def breed(dad, mom, r):
+def breed(dad, mom, r, cities):
     crossover_cities = []
+    index_mom_list = []
     dadRoute = dad.getList()
     momRoute = mom.getList()
-    index = 0
+    #print("dadRoute: ", dadRoute)
+    #print("momRoute: ", momRoute)
+    index_dad = 0
+    index_mom = 0
     #type check necessary
+    #i: int
     for i in dadRoute:
         if isPicked(i, r):
-            a = GeneIndex(i, index)
+            a = GeneIndex(i, index_dad) # 1, 2, 4
             crossover_cities.append(a)
-            index = getIndexList(momRoute, i)
-            momRoute[index] = 0
-        index += 1
-    for j in crossover_cities:
-        momRoute[j.getIndex()] = j.getNum()
-    child = Parent(momRoute, 0)
+            index_mom = getIndexList(momRoute, i) # 3, 5, 6
+            index_mom_list.append(index_mom)
+        index_dad += 1
+    # sort indices in increasing order
+    index_mom_list.sort() 
+    for j in range(len(crossover_cities)):
+        momRoute[index_mom_list[j]] = crossover_cities[j].getNum()
+    child_fitness = computeFitness(momRoute, cities)
+    child = Parent(momRoute, child_fitness)
     return child
 
 ### randomly create pairs of Parent()s
@@ -166,32 +176,32 @@ def alignFitness(parents):
 ### input: number of cities, num of initial population
 ### output: list of Parent()
 def initialPopulation(num, pop, cities):
-    printPretty("Generating intial population...")
-    population = []
+    pp("Generating intial population...")
+    population = [0 for x in range(pop)]
     alignedList = list(range(1, num+1))
     # generate random permutated lists
     count = 0
     while count < pop:
-        random.shuffle(alignedList) # not aligned anymore
-        population.append(alignedList)
-        count += 1
-
-    for route in population: # route: list of int
+        l = copy.copy(alignedList)
+        random.shuffle(l) # not aligned anymore
+        route = l
         fitness = computeFitness(route, cities)
-        parent = Parent(route, fitness)
-        index = getIndexList(population, route)
-        population[index] = parent
-
-    printPretty("Generated intial population")
+        population[count] = Parent(route, fitness)
+        #for i in range(count+1):
+        #    print("THIS: ", population[i].getList()[:5])
+        count += 1
+        #print("loop {0}, pop: ".format(count), population)
+    for i in population:
+        print(i.getList()[:5])
+    pp("Generated intial population")
     return population
-
 
 
 ### calculate fitness: total distance between cities
 ### input: list of int, list of City()
 ### output: int
 def computeFitness(route, cities):
-    #printPretty("Computing Fitness...")
+    #pp("Computing Fitness...")
     distance = 0
     actualRoute = [cities[i-1] for i in route] # list of City()
     length = len(actualRoute)
@@ -201,7 +211,7 @@ def computeFitness(route, cities):
             distance += actualRoute[i].getDistance(actualRoute[0])
         else:
             distance += actualRoute[i].getDistance(actualRoute[i+1])
-    #printPretty("Computed FPS")
+    #pp("Computed FPS")
     return distance
         
 
@@ -209,15 +219,17 @@ def computeFitness(route, cities):
 ### input: list of Parent(), total sum of fitness, list of float
 ### output: list of Parent()
 def computeFPS(parents, sumFitness, everyFitness):
-    #printPretty("Computing FPS...")
+    print("Fitness of all: ", everyFitness)
     minimum = everyFitness[0]
     num = len(parents)
+    print("최소: ", minimum)
+    print("분모: ", sumFitness-minimum*num)
+
     for parent in parents:
-        index = getIndexList(everyFitness, parent.getFitness())
-        prob = float((everyFitness[-(index+1)]-minimum) / (sumFitness-minimum*num))
-        #prob = float(parent.getFitness() / sumFitness)
+        print("BEFORE COMPUTEFPS: ", parent.getList()[:5])
+        index = getIndexList(everyFitness, parent.getFitness())        
+        prob = float(    (everyFitness[-(index+1)]-minimum) / (sumFitness-minimum*num)    )        
         parent.setProbability(prob)
-    #printPretty("Computed FPS")
     return parents
 
 
@@ -227,9 +239,12 @@ def computeFPS(parents, sumFitness, everyFitness):
 ### input: list of Parent(), number of next generation
 ### ouput: list of Parent()
 def sampleSUS(parents, N):
-    printPretty("Sampling using SUS...")
-    selected = [0 for x in range(N)]
+    for j in parents:
+        print("BEFORE SAMPLESUS: ", j.getList()[:5])
+    pp("Sampling using SUS...")
+    selected = [0 for x in range(N)] #[0, 0, ..., 0]
     cumul_prob = getCumulProb(parents)
+    print("누적도수분포: ", cumul_prob)
     current_member = 0
     i = 0
     r = random.uniform(0, 1/N)
@@ -239,14 +254,21 @@ def sampleSUS(parents, N):
             r += 1/N
             current_member += 1
         i += 1
-    printPretty("Sampled using SUS")
+    for p in selected:
+        print("BEFORE AAAAAAA: ", p.getList()[:5])
+    pp("Sampled using SUS")
     return selected
 
 ### Make pairs of Parent()s, randomly and uniformly pick some part and switch the same number sequence retaining its orders
 ### input: list of Parent(), crossover rate(0~1.0), total population int
 ### output: list of Parent()
-def orderedCrossover(selected, r, pop):
-    printPretty("Crossovering...")
+def orderedCrossover(selected, r, pop, cities):
+    pp("Crossovering...")
+    for p in selected:
+        print("Before crossover: ", p.getList()[:5])
+    
+    
+    
     childs = []
     numChild = 0
     numPop = int(0.5*pop if pop%2==0 else 0.5*pop+1)
@@ -256,13 +278,13 @@ def orderedCrossover(selected, r, pop):
         pairs = makePair(selected)
         for pair in pairs:
             numChild += 1
-            printPretty("Creating Child #{0}...".format(numChild))
+            pp("Creating Child #{0}...".format(numChild))
             if len(pair) == 2:
-                child = breed(pair[0], pair[1], r)
+                child = breed(pair[0], pair[1], r, cities)
             else:
                 child = pair[0]
             childs.append(child)
-    printPretty("Crossovered")
+    pp("Crossovered")
     return childs
 
     
@@ -271,13 +293,14 @@ def orderedCrossover(selected, r, pop):
 ### input: list of Parent(), probability r(0~1.0)
 ### output: list of Parent()
 def mutate(crossovered, r):
-    printPretty("Mutating...")
+    pp("Mutating...")
     for parent in crossovered:
         li = parent.getList()
-        #print("getlist: ", li)
+        print("before mutation getlist: ", li[:5])
         mutated_li = mutateIndividual(li, r)
+        print("after mutation getlist: ", mutated_li[:5])
         parent.setList(mutated_li)
-    printPretty("Mutated")
+    pp("Mutated")
     return crossovered
 
 
@@ -286,11 +309,14 @@ def mutate(crossovered, r):
 ### input: list of Parent()
 ### output: list of Parent()
 def updateFitness(parents, cities):
-    printPretty("Updating fitness of the mutated...")
+    pp("Updating fitness of the mutated...")
     for parent in parents:
+        print("!!!!!!!!!!!!!!!!!!!!!: ", parent.getList()[:6])
         fit = computeFitness(parent.getList(), cities)
         parent.setFitness(fit)
-    printPretty("Updated fitness of the mutated")
+        print("updated fit: ",fit)
+    
+    pp("Updated fitness of the mutated")
     return parents
 
 
@@ -298,7 +324,7 @@ def updateFitness(parents, cities):
 ### input: list of Parent(), list of Parent(), percentage of elite(0~1.0)
 ### output: list of Parent()
 def chooseBestGeneration(parent, child, m):
-    printPretty("Choosing the best generation...")
+    pp("Choosing the best generation...")
     best = []
     l = len(parent)
     #numElite = int(l*m)
@@ -311,7 +337,7 @@ def chooseBestGeneration(parent, child, m):
     #print("best child: ", best_child)
     best = best_parent + best_child
     #print(best)
-    printPretty("Chose the best generation")
+    pp("Chose the best generation")
     return best
 
 
@@ -321,12 +347,12 @@ def chooseBestGeneration(parent, child, m):
 ### input: list of Parent()
 ### output: Parent()
 def chooseBestOne(pop):
-    printPretty("Choosing the best one...")
+    pp("Choosing the best one...")
     res = pop[0]
     for parent in pop:
         if parent.getFitness() > res.getFitness():
             res = parent
-    printPretty("Chose the best one")
+    pp("Chose the best one")
     return res
 
 
@@ -348,13 +374,13 @@ def drawPlot(x, y, count, theBestFitness):
 ### input: list of int
 ### output: .csv with single column city indices
 def createCSV(arg):
-    printPretty("Creating CSV file...")
+    pp("Creating CSV file...")
     length = len(arg)
     csv = open('solution_{0}.csv'.format(str(datetime.datetime.now().time())[:-7]), 'w')
     for i in range(length):
         data = str(arg[i])
         csv.write(data+"\n")
-    printPretty("Created CSV file")
+    pp("Created CSV file")
     return csv
 
 
@@ -396,32 +422,42 @@ def main():
         y = int(float(lines[i][2]))
         cities.append(City(i+1, x, y))
     initialPop = initialPopulation(num, pop, cities)
-
+    for k in initialPop:
+        print("IIIIIIIIIIIPOPPOPOPOPO: ", k.getList()[:5])
     # main loop
     count = 0
     population = initialPop # list of Parent()
+    for i in population:
+        print("POPPOPOPOPO: ", i.getList()[:5])
     while count < loop:
+        #print("Population of 2nd: ", population)
         count += 1
         selected = []
         sumfit = sumFitness(population)
         everyFitness = getFitnessOfAll(population)
+        #print("FITNESS OF ALL: ", everyFitness)
         population = computeFPS(population, sumfit, everyFitness)
         #print("fps computed: ", population)
         selected_parent = sampleSUS(population, int(0.5*pop))
         #print("sus computed: ", selected_parent)
-        crossovered_child = orderedCrossover(selected_parent, crossoverRate, pop)
+        crossovered_child = orderedCrossover(selected_parent, crossoverRate, pop, cities)
         #print("crossovered: ", crossovered_child)
         mutated_parent = mutate(selected_parent, mutationRate)
         #print("mutated parent: ", mutated_parent)
         mutated_child = mutate(crossovered_child, mutationRate)
         #print("mutated child: ", mutated_child)
         mutated_parent = updateFitness(mutated_parent, cities)
+        #print("updated mutated parent: ", mutated_parent)
         mutated_child = updateFitness(mutated_child, cities)
+        #print("updated mutated child: ", mutated_child)
         population = chooseBestGeneration(mutated_parent, mutated_child, elite) # list of Parent()
         #print("population: ", population)
         theBestOne = chooseBestOne(population) # Parent()
         theBestFitness = float(theBestOne.getFitness())
+
+        ### Plotting
         drawPlot(xlist, ylist, count, theBestFitness)
+
         print("THE BEST of GENERATION #{0}: {1}".format(count, theBestFitness))
     while True:
         plt.pause(0.05)

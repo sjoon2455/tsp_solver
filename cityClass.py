@@ -7,8 +7,12 @@ class City:
         self.y = y
     
     def getDistance(self, c):
-        return(((self.x-c.x)**2+(self.y-c.y)**2)**0.5)
-    
+        return(   ((self.getX()-c.getX())**2+(self.getY()-c.getY())**2)**0.5 )
     def getIndex(self):
         return self.n
     
+    def getX(self):
+        return self.x
+    
+    def getY(self):
+        return self.y
