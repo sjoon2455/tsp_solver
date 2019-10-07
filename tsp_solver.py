@@ -19,7 +19,7 @@ import copy
 def sumFitness(parents):
     res = 0
     for i in parents:
-        print("BEFORE SUMFITNESS: ", i.getList()[:5])
+        #print("BEFORE SUMFITNESS: ", i.getList()[:5])
         fit = i.getFitness()
         res += fit
     return res
@@ -89,8 +89,8 @@ def getIndexList(li, n):
 def breed(dad, mom, r, cities):
     crossover_cities = []
     index_mom_list = []
-    dadRoute = dad.getList()
-    momRoute = mom.getList()
+    dadRoute = dad.getList().copy()
+    momRoute = mom.getList().copy()
     #print("dadRoute: ", dadRoute)
     #print("momRoute: ", momRoute)
     index_dad = 0
@@ -226,7 +226,7 @@ def computeFPS(parents, sumFitness, everyFitness):
     print("분모: ", sumFitness-minimum*num)
 
     for parent in parents:
-        print("BEFORE COMPUTEFPS: ", parent.getList()[:5])
+        #print("BEFORE COMPUTEFPS: ", parent.getList()[:5])
         index = getIndexList(everyFitness, parent.getFitness())        
         prob = float(    (everyFitness[-(index+1)]-minimum) / (sumFitness-minimum*num)    )        
         parent.setProbability(prob)
@@ -239,8 +239,8 @@ def computeFPS(parents, sumFitness, everyFitness):
 ### input: list of Parent(), number of next generation
 ### ouput: list of Parent()
 def sampleSUS(parents, N):
-    for j in parents:
-        print("BEFORE SAMPLESUS: ", j.getList()[:5])
+    #for j in parents:
+    #    print("BEFORE SAMPLESUS: ", j.getList()[:5])
     pp("Sampling using SUS...")
     selected = [0 for x in range(N)] #[0, 0, ..., 0]
     cumul_prob = getCumulProb(parents)
@@ -255,7 +255,7 @@ def sampleSUS(parents, N):
             current_member += 1
         i += 1
     #for p in selected:
-    #    print("BEFORE AAAAAAA: ", p.getList()[:5])
+    #    print("PARENT: ", p.getList()[:5])
     pp("Sampled using SUS")
     return selected
 
@@ -264,15 +264,13 @@ def sampleSUS(parents, N):
 ### output: list of Parent()
 def orderedCrossover(selected, r, pop, cities):
     pp("Crossovering...")
-    #for p in selected:
-    #    print("Before crossover: ", p.getList()[:5])
+
     childs = []
     numChild = 0
     numPop = int(0.5*pop if pop%2==0 else 0.5*pop+1)
-    #print(numPop) # 6
     while numChild < numPop:
-        #print("SELECTED: ", selected)
         pairs = makePair(selected)
+        
         for pair in pairs:
             numChild += 1
             pp("Creating Child #{0}...".format(numChild))
@@ -311,7 +309,7 @@ def updateFitness(parents, cities):
         #print("!!!!!!!!!!!!!!!!!!!!!: ", parent.getList()[:6])
         fit = computeFitness(parent.getList(), cities)
         parent.setFitness(fit)
-        print("updated fit: ",fit)
+        #print("updated fit: ",fit)
     
     pp("Updated fitness of the mutated")
     return parents
@@ -324,8 +322,8 @@ def chooseBestGeneration(parent, child, m):
     pp("Choosing the best generation...")
     best = []
     l = len(parent)
-    #numElite = int(l*m)
-    numElite = 2
+    numElite = int(l*m)
+    #numElite = 2
     
     aligned_parent = alignFitness(parent)
     best_parent = aligned_parent[:numElite]
@@ -452,8 +450,9 @@ def main():
         drawPlot(xlist, ylist, count, theBestFitness)
 
         print("THE BEST of GENERATION #{0}: {1}".format(count, theBestFitness))
-    while True:
-        plt.pause(0.05)
+    plt.pause(5)
+    #while True:
+    #    plt.pause(0.05)
     solution = parentToInt(theBestOne)
     createCSV(solution)
 
