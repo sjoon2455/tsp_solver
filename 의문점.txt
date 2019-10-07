@@ -1,1 +1,0 @@
-parent 1 의 mutated list 가 parent 2 의 list 가 되어있음

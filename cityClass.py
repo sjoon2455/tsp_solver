@@ -2,9 +2,9 @@
 # n, x, y: int
 class City:
     def __init__(self, n, x, y):
-        self.n = n
-        self.x = x
-        self.y = y
+        self.n = n #int
+        self.x = x #int
+        self.y = y #int
     
     def getDistance(self, c):
         return(   ((self.getX()-c.getX())**2+(self.getY()-c.getY())**2)**0.5 )

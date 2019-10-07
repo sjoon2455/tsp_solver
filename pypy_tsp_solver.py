@@ -7,7 +7,7 @@ from cityClass import City
 from parentClass import Parent
 from geneIndexClass import GeneIndex
 from printPretty import printPretty as pp
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import copy
 
 
@@ -335,7 +335,7 @@ def chooseBestOne(pop):
     pp("Chose the best one")
     return sorted_pop[0]
 
-
+'''
 ### draw plot end of every loop
 ### input: list of int, list of float, int, float
 ### output: -
@@ -346,30 +346,8 @@ def drawPlot(x, y, count, theBestFitness):
     plt.plot(count, theBestFitness, "ro-")
     plt.show()
     plt.pause(0.0001)
+'''    
     
-    
-
-### return list of x coordinates
-### input: list of int, list of City()
-### output: list of int
-def city_x(slist, cities):
-    res = []
-    for s in slist:
-        city = cities[s-1]  # City()
-        res.append(city.getX())
-    return res
-
-
-
-### return list of y coordinates
-### input: list of int, list of City()
-### output: list of int
-def city_y(slist, cities):
-    res = []
-    for s in slist:
-        city = cities[s-1]  # City()
-        res.append(city.getY())
-    return res
 
 
 ### given list of int with city indices, create csv file
@@ -401,8 +379,9 @@ def main():
     mutationRate = float(sys.argv[6]) # percentage of being mutated
     
     ### for plotting
+    '''
     plt.ion()
-    fig=plt.figure(0)
+    fig=plt.figure()
     plt.axis([0,loop,0,100000000])
     plt.ylim(bottom = 80000000)
     plt.yscale('log')
@@ -410,9 +389,7 @@ def main():
     plt.xlabel('Generation')
     xlist=list()
     ylist=list()
-
-    
-
+    '''
     lines = prob_open.readlines()
     len = lines[3]
     num = int(len[12:])
@@ -458,28 +435,13 @@ def main():
         theBestFitness = float(theBestOne.getFitness())
 
         ### Plotting
-        drawPlot(xlist, ylist, count, theBestFitness)
+        #drawPlot(xlist, ylist, count, theBestFitness)
 
         print("THE BEST of GENERATION #{0}: {1}".format(count, theBestFitness))
-    plt.pause(5)
+    #plt.pause(5)
     #while True:
     #    plt.pause(0.05)
     solution = parentToInt(theBestOne)
-    
-    
-    ### for plotting2
-    xlist_res = city_x(solution, cities)
-    ylist_res = city_y(solution, cities)
-    xmax = max(xlist_res)
-    ymax = max(ylist_res)
-    plt.figure(1)
-    plt.axis([0, xmax, 0, ymax])
-    plt.ylabel('y')
-    plt.xlabel('x')
-    plt.plot(xlist_res, ylist_res, color = "black", linewidth =0.05)
-    plt.show()
-    plt.pause(10)
-
     createCSV(solution)
 
     prob_open.close()
